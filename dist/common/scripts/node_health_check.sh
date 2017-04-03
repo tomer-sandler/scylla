@@ -528,5 +528,6 @@ echo "--------------------------------------------------"
 
 
 echo "Health Check Report Created Successfully"
+echo "Path to Report: $REPORT"
 echo "--------------------------------------------------"
 
