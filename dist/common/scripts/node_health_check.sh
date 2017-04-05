@@ -193,11 +193,13 @@ echo "--------------------------------------------------"
 nodetool status >> $OUTPUT_PATH3/nodetool-status.txt
 nodetool info >> $OUTPUT_PATH3/nodetool-info.txt
 nodetool netstats >> $OUTPUT_PATH3/nodetool-netstats.txt
+nodetool gossipinfo >> $OUTPUT_PATH3/nodetool-gossipinfo.txt
 nodetool proxyhistograms >> $OUTPUT_PATH3/nodetool-proxyhistograms.txt
 nodetool cfstats -H | grep Keyspace -A 4 >> $OUTPUT_PATH3/nodetool-cfstats-keyspace.txt
 nodetool cfstats -H | egrep 'Table:|SSTable count:|Compacted|tombstones' | awk '{$1=$1};1' | awk '{print; if (FNR % 7 == 0 ) printf "\n --";}' >> $OUTPUT_PATH3/nodetool-cfstats-table.txt
 sed -i '1s/^/ --/' $OUTPUT_PATH3/nodetool-cfstats-table.txt
 nodetool compactionstats >> $OUTPUT_PATH3/nodetool-compactionstats.txt
+nodetool ring >> $OUTPUT_PATH3/nodetool-ring.txt
 #nodetool cfhistograms $KS $TN >> $OUTPUT_PATH3/nodetool-cfhistograms.txt
 
 
@@ -518,6 +520,13 @@ echo "" >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
+
+echo "Signatures" >> $REPORT
+echo "----------" >> $REPORT
+date "+DATE: %m/%d/%y" >> $REPORT
+echo "" >> $REPORT
+echo "" >> $REPORT
+echo "Scylla:________________    Customer:________________" >> $REPORT
 echo "" >> $REPORT
 
 
