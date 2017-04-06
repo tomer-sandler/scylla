@@ -128,7 +128,6 @@ mkdir $OUTPUT_PATH
 mkdir $OUTPUT_PATH1 $OUTPUT_PATH2 $OUTPUT_PATH3 $OUTPUT_PATH4 $OUTPUT_PATH5
 
 
-
 ##Output Collection##
 #System Checks#
 echo "Collecting System Info"
@@ -203,7 +202,7 @@ nodetool cfstats -H | egrep 'Table:|SSTable count:|Compacted|tombstones' | awk '
 sed -i '1s/^/ --/' $OUTPUT_PATH3/nodetool-cfstats-table.txt
 nodetool compactionstats >> $OUTPUT_PATH3/nodetool-compactionstats.txt
 nodetool ring >> $OUTPUT_PATH3/nodetool-ring.txt
-#nodetool cfhistograms $KS $TN >> $OUTPUT_PATH3/nodetool-cfhistograms.txt
+#not implemented: nodetool cfhistograms $KS $TN >> $OUTPUT_PATH3/nodetool-cfhistograms.txt#
 
 
 #Data Model#
@@ -241,7 +240,6 @@ echo "Print Data Model: ${print_dm}"
 echo "Print Network Info: ${print_net}"
 echo "--------------------------------------------------"
 
-
 echo "" >> $REPORT
 echo "                    Health Check Report for `hostname -i`" >> $REPORT 
 echo "" >> $REPORT
@@ -263,20 +261,17 @@ echo "SYSTEM INFO" >> $REPORT
 echo "===========" >> $REPORT
 echo "" >> $REPORT
 
-
 echo "Host Operating System" >> $REPORT
 echo "---------------------" >> $REPORT
 cat $OUTPUT_PATH1/os-release.txt >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
 
-
 echo "Kernel Release" >> $REPORT
 echo "--------------" >> $REPORT
 cat $OUTPUT_PATH1/kernel-release.txt >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
-
 
 echo "Number of CPUs and CPU Info" >> $REPORT
 echo "---------------------------" >> $REPORT
@@ -286,7 +281,6 @@ cat $OUTPUT_PATH1/cpu-info.txt >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
 
-
 echo "Memory Info in MB" >> $REPORT
 echo "-----------------" >> $REPORT
 cat $OUTPUT_PATH1/mem-info_MB.txt >> $REPORT
@@ -295,7 +289,6 @@ cat $OUTPUT_PATH1/vmstat.txt >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
 
-
 echo "Storage/Disk Info" >> $REPORT
 echo "-----------------" >> $REPORT
 cat $OUTPUT_PATH1/capacity-info.txt >> $REPORT
@@ -303,13 +296,11 @@ echo "" >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
 
-
 echo "RAID Configuration" >> $REPORT
 echo "------------------" >> $REPORT
 cat $OUTPUT_PATH1/raid-conf.txt >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
-
 
 echo "I/O Scheduler Configuration" >> $REPORT
 echo "---------------------------" >> $REPORT
@@ -323,7 +314,6 @@ echo "ScyllaDB INFO" >> $REPORT
 echo "=============" >> $REPORT
 echo "" >> $REPORT
 
-
 echo "SW Version (PKGs)" >> $REPORT
 echo "-----------------" >> $REPORT
 cat $OUTPUT_PATH2/scylla-version.txt >> $REPORT
@@ -331,7 +321,6 @@ echo "" >> $REPORT
 cat $OUTPUT_PATH2/scylla-pkgs.txt >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
-
 
 echo "Configuration files" >> $REPORT
 echo "-------------------" >> $REPORT
@@ -356,13 +345,11 @@ cat $OUTPUT_PATH2/multi-DC.txt >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
 
-
 echo "Check for Coredumps" >> $REPORT
 echo "-------------------" >> $REPORT
 cat $OUTPUT_PATH2/coredump-folder.txt >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
-
 
 echo "Nodetool Status/Info/Gossip" >> $REPORT
 echo "---------------------------" >> $REPORT
@@ -466,7 +453,6 @@ if [ $print_net == "YES" ]; then
 	echo "" >> $REPORT
 	echo "" >> $REPORT
 
-
 	echo "sysctl -a" >> $REPORT
 	echo "---------" >> $REPORT
 	cat $OUTPUT_PATH5/sysctl.txt >> $REPORT
@@ -544,12 +530,10 @@ echo "" >> $REPORT
 echo "Scylla:________________    Customer:________________" >> $REPORT
 echo "" >> $REPORT
 
-
 echo "Archiving Output Files"
 echo "--------------------------------------------------"
 tar cvzf output_files.tgz $OUTPUT_PATH --remove-files
 echo "--------------------------------------------------"
-
 
 echo "Health Check Report Created Successfully"
 echo "Path to Report: $REPORT"
