@@ -20,10 +20,13 @@ print_cfstats=NO
 while getopts 'hdncaz:' opt; do
 	case $opt in
 		h)
-			echo ""
-			echo "The output of the following sections is collected, but not printed in the report."
-			echo "If you wish to have them printed, please supply the relevant flag/s."
-			echo ""
+                        echo ""
+                        echo "This script performs system review and generates health check report based on"
+                        echo "the configuration data (hardware, OS, Scylla SW, etc.) collected from the node."
+                        echo ""
+                        echo "Note: the output of these sepcific sections is collected, but not printed in the report."
+                        echo "If you wish to have them printed, please supply the relevant flag/s."
+                        echo ""
 			echo "Usage:"
 			echo "-c   Print cfstats"
                         echo "-d   Print Data Model"
@@ -243,6 +246,18 @@ echo "" >> $REPORT
 echo "                    Health Check Report for `hostname -i`" >> $REPORT 
 echo "" >> $REPORT
 echo "" >> $REPORT
+
+
+echo "PURPOSE" >> $REPORT
+echo "=======" >> $REPORT
+echo "" >> $REPORT
+echo "This document first serves as a system review and health check report." >> $REPORT
+echo "It is based on the configuration data (hardware, OS, Scylla SW, etc.) collected from the node." >> $REPORT
+echo "Based on the review and analysis of the collected data, ScyllaDB can recommend on possible" >> $REPORT
+echo "ways to better utilize the cluster, based on both experiance and best practices." >> $REPORT
+echo "" >> $REPORT
+echo "" >> $REPORT
+
 
 echo "SYSTEM INFO" >> $REPORT
 echo "===========" >> $REPORT
@@ -482,7 +497,6 @@ echo "" >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
-echo "" >> $REPORT
 
 echo "Backup / Restore Review" >> $REPORT
 echo "-----------------------" >> $REPORT
@@ -494,11 +508,9 @@ echo "" >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
-echo "" >> $REPORT
 
 echo "Repair Verification" >> $REPORT
 echo "-------------------" >> $REPORT
-echo "" >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
@@ -512,7 +524,6 @@ echo "" >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
-echo "" >> $REPORT
 
 echo "Other" >> $REPORT
 echo "-----" >> $REPORT
@@ -521,8 +532,9 @@ echo "" >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
 
+
 echo "Signatures" >> $REPORT
-echo "----------" >> $REPORT
+echo "==========" >> $REPORT
 date "+DATE: %m/%d/%y" >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
