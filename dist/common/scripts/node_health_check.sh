@@ -378,7 +378,6 @@ echo "## Nodetool GossipInfo ##" >> $REPORT
 cat $OUTPUT_PATH3/nodetool-gossipinfo.txt >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
-echo "" >> $REPORT
 
 if [ $print_dm == "YES" ]; then
         echo "Printing Data Model Info to Report"
@@ -413,6 +412,7 @@ echo "" >> $REPORT
 echo "Nodetool netstats" >> $REPORT
 echo "-----------------" >> $REPORT
 cat $OUTPUT_PATH3/nodetool-netstats.txt >> $REPORT
+echo "" >> $REPORT
 echo "" >> $REPORT
 
 if [ $print_cfstats == "YES" ]; then
