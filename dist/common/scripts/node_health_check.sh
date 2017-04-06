@@ -100,7 +100,7 @@ if [ "${IS_FEDORA}" == "0" ]; then
 fi
 
 if [ "${IS_DEBIAN}" == "0" ]; then
-	sudo apt-get update
+	sudo apt-get update -qq
 	sudo apt-get install net-tools -y -qq
 fi
 
@@ -115,7 +115,6 @@ if [ "${IS_FEDORA}" == "0" ]; then
 fi
 
 if [ "${IS_DEBIAN}" == "0" ]; then
-   sudo apt-get update
    sudo apt-get install lshw -y -qq
 fi
 
