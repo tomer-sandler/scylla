@@ -367,14 +367,14 @@ echo "" >> $REPORT
 echo "Nodetool Status/Info/Gossip" >> $REPORT
 echo "---------------------------" >> $REPORT
 echo "## Nodetool Status ##" >> $REPORT
-cat $OUTPUT_PATH3/nodetool-info.txt >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-echo "## Nodetool Info ##" >> $REPORT
 cat $OUTPUT_PATH3/nodetool-status.txt >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
-echo "## Nodetool Gossip ##" >> $REPORT
+echo "## Nodetool Info ##" >> $REPORT
+cat $OUTPUT_PATH3/nodetool-info.txt >> $REPORT
+echo "" >> $REPORT
+echo "" >> $REPORT
+echo "## Nodetool GossipInfo ##" >> $REPORT
 cat $OUTPUT_PATH3/nodetool-gossipinfo.txt >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
