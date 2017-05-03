@@ -21,58 +21,58 @@ SCYLLA_SERVICE="0"
 JMX_SERVICE="0"
 
 while getopts ":hdncap:q:" opt; do
-	case $opt in
-		h)	echo ""
-			echo "This script performs system review and generates health check report based on"
-			echo "the configuration data (hardware, OS, Scylla SW, etc.) collected from the node."
-			echo ""
-			echo "Usage:"
-			echo "-p   Port to use for nodetool commands (default: 7199)"
-			echo "-q   Port to use for cqlsh (default: 9042)"
-			echo "-c   Print cfstats output"
-			echo "-d   Print data model info"
-			echo "-n   Print network info"
-			echo "-a   Print all"
-			echo "-h   Display this help and exit"
-			echo ""
-			echo "Note: output for the above is collected, but not printed in the report."
-			echo "If you wish to have them printed, please supply the relevant flag/s."
-			echo ""
-			exit 2
-			;;
-		p)	JMX_PORT=$OPTARG ;;
-		q)	CQL_PORT=$OPTARG ;;
-		d)	PRINT_DM=YES ;;
-		n)	PRINT_NET=YES ;;
-		c)	PRINT_cfstats=YES ;;
-		a)	PRINT_DM=YES
-			PRINT_NET=YES
-			PRINT_cfstats=YES
-			;;
-		\?)	echo "Invalid option: -$OPTARG"
-			exit 2
-			;;
-		:)	echo "Option -$OPTARG requires an argument."
-			exit 2
-			;;
-	esac
+    case $opt in
+        h)    echo ""
+            echo "This script performs system review and generates health check report based on"
+            echo "the configuration data (hardware, OS, Scylla SW, etc.) collected from the node."
+            echo ""
+            echo "Usage:"
+            echo "-p   Port to use for nodetool commands (default: 7199)"
+            echo "-q   Port to use for cqlsh (default: 9042)"
+            echo "-c   Print cfstats output"
+            echo "-d   Print data model info"
+            echo "-n   Print network info"
+            echo "-a   Print all"
+            echo "-h   Display this help and exit"
+            echo ""
+            echo "Note: output for the above is collected, but not printed in the report."
+            echo "If you wish to have them printed, please supply the relevant flag/s."
+            echo ""
+            exit 2
+            ;;
+        p)    JMX_PORT=$OPTARG ;;
+        q)    CQL_PORT=$OPTARG ;;
+        d)    PRINT_DM=YES ;;
+        n)    PRINT_NET=YES ;;
+        c)    PRINT_cfstats=YES ;;
+        a)    PRINT_DM=YES
+            PRINT_NET=YES
+            PRINT_cfstats=YES
+            ;;
+        \?)    echo "Invalid option: -$OPTARG"
+            exit 2
+            ;;
+        :)    echo "Option -$OPTARG requires an argument."
+            exit 2
+            ;;
+    esac
 done
 
 
 ##Check if server is Fedora/Debian release##
 cat /etc/os-release | grep fedora &> /dev/null
 if [ $? -ne 0 ]; then
-	IS_FEDORA="1"
+    IS_FEDORA="1"
 fi
 
 cat /etc/os-release | grep debian &> /dev/null
 if [ $? -ne 0 ]; then
-	IS_DEBIAN="1"
+    IS_DEBIAN="1"
 fi
 
 if [ "$IS_FEDORA" == "1" ] && [ "$IS_DEBIAN" == "1" ]; then
-	echo "This s a Non-Supported OS, Please Review the Support Matrix"
-	exit 222
+    echo "This s a Non-Supported OS, Please Review the Support Matrix"
+    exit 222
 fi
 
 ##Pass criteria for script execution##
@@ -83,13 +83,13 @@ echo "--------------------------------------------------"
 
 ps -C scylla --no-headers &> /dev/null
 if [ $? -ne 0 ]; then
-	SCYLLA_SERVICE="1"
-	echo "ERROR: Scylla is NOT Running"
-	echo "Cannot Collect Data Model Info"
-	echo "--------------------------------------------------"
+    SCYLLA_SERVICE="1"
+    echo "ERROR: Scylla is NOT Running"
+    echo "Cannot Collect Data Model Info"
+    echo "--------------------------------------------------"
 else
-	echo "Scylla Service: OK"
-	echo "--------------------------------------------------"
+    echo "Scylla Service: OK"
+    echo "--------------------------------------------------"
 fi 
 
 
@@ -99,14 +99,14 @@ echo "--------------------------------------------------"
 
 nodetool -p$JMX_PORT status &> /dev/null
 if [ $? -ne 0 ]; then
-	JMX_SERVICE="1"
-	echo "ERROR: Scylla-JMX is NOT Running / NOT Listening on Port $JMX_PORT"
-	echo "Cannot Collect Nodetool Info"
-	echo "Use the '-p' Option to Provide the Scylla-JMX Port"
-	echo "--------------------------------------------------"
+    JMX_SERVICE="1"
+    echo "ERROR: Scylla-JMX is NOT Running / NOT Listening on Port $JMX_PORT"
+    echo "Cannot Collect Nodetool Info"
+    echo "Use the '-p' Option to Provide the Scylla-JMX Port"
+    echo "--------------------------------------------------"
 else
-	echo "JMX Service (nodetool): OK"
-	echo "--------------------------------------------------"
+    echo "JMX Service (nodetool): OK"
+    echo "--------------------------------------------------"
 fi 
 
 
@@ -115,12 +115,12 @@ echo "Installing 'net-tools' Package (for 'netstat' command)"
 echo "--------------------------------------------------"
 
 if [ "$IS_FEDORA" == "0" ]; then
-	sudo yum install net-tools -y -q
+    sudo yum install net-tools -y -q
 fi
 
 if [ "$IS_DEBIAN" == "0" ]; then
-#	sudo apt-get update -qq
-	sudo apt-get install net-tools -y | grep already
+#    sudo apt-get update -qq
+    sudo apt-get install net-tools -y | grep already
 fi
 
 
@@ -151,22 +151,22 @@ echo "Collecting Scylla Info"
 echo "--------------------------------------------------"
 
 if [ "$IS_FEDORA" == "0" ]; then
-	rpm -qa | grep -i scylla > $OUTPUT_PATH2/scylla-pkgs.txt
+    rpm -qa | grep -i scylla > $OUTPUT_PATH2/scylla-pkgs.txt
 fi
 
 if [ "$IS_DEBIAN" == "0" ]; then
-	dpkg -l | grep -i scylla > $OUTPUT_PATH2/scylla-pkgs.txt
+    dpkg -l | grep -i scylla > $OUTPUT_PATH2/scylla-pkgs.txt
 fi
 
 curl -s -X GET "http://localhost:10000/storage_service/scylla_release_version" > $OUTPUT_PATH2/scylla-version.txt && echo "" >> $OUTPUT_PATH2/scylla-version.txt
 cat /etc/scylla/scylla.yaml | grep -v "#" | grep -v "^[[:space:]]*$" > $OUTPUT_PATH2/scylla-yaml.txt
 
 if [ "$IS_FEDORA" == "0" ]; then
-	cat /etc/sysconfig/scylla-server | grep -v "^[[:space:]]*$" > $OUTPUT_PATH2/scylla-server.txt
+    cat /etc/sysconfig/scylla-server | grep -v "^[[:space:]]*$" > $OUTPUT_PATH2/scylla-server.txt
 fi
 
 if [ "$IS_DEBIAN" == "0" ]; then
-	cat /etc/default/scylla-server | grep -v "^[[:space:]]*$" > $OUTPUT_PATH2/scylla-server.txt
+    cat /etc/default/scylla-server | grep -v "^[[:space:]]*$" > $OUTPUT_PATH2/scylla-server.txt
 fi
 
 cat /etc/scylla/cassandra-rackdc.properties | grep -v "#" |grep -v "^[[:space:]]*$" > $OUTPUT_PATH2/multi-DC.txt
@@ -179,9 +179,9 @@ echo "--------------------------------------------------"
 
 journalctl --help &> /dev/null
 if [ $? -eq 0 ]; then
-	journalctl -t scylla > $OUTPUT_PATH/scylla-logs.txt
+    journalctl -t scylla > $OUTPUT_PATH/scylla-logs.txt
 else
-	cat /var/log/syslog | grep -i scylla > $OUTPUT_PATH/scylla-logs.txt
+    cat /var/log/syslog | grep -i scylla > $OUTPUT_PATH/scylla-logs.txt
 fi
 
 gzip -f $OUTPUT_PATH/scylla-logs.txt
@@ -189,42 +189,42 @@ gzip -f $OUTPUT_PATH/scylla-logs.txt
 
 #Nodetool commands#
 if [ "$JMX_SERVICE" == "1" ]; then
-	echo "Skipping Nodetool Info Collection"
-	echo "--------------------------------------------------"
+    echo "Skipping Nodetool Info Collection"
+    echo "--------------------------------------------------"
 else
-	echo "Collecting Nodetool Commands Info (using port $JMX_PORT)"
-	echo "--------------------------------------------------"
-	nodetool -p$JMX_PORT status > $OUTPUT_PATH3/nodetool-status.txt
-	nodetool -p$JMX_PORT info > $OUTPUT_PATH3/nodetool-info.txt
-	nodetool -p$JMX_PORT netstats > $OUTPUT_PATH3/nodetool-netstats.txt
-	nodetool -p$JMX_PORT gossipinfo > $OUTPUT_PATH3/nodetool-gossipinfo.txt
-	nodetool -p$JMX_PORT proxyhistograms > $OUTPUT_PATH3/nodetool-proxyhistograms.txt
-	nodetool -p$JMX_PORT cfstats -H | grep Keyspace -A 4 > $OUTPUT_PATH3/nodetool-cfstats-keyspace.txt
-	nodetool -p$JMX_PORT cfstats -H | egrep 'Table:|SSTable count:|Compacted|tombstones' | awk '{$1=$1};1' | awk '{print; if (FNR % 7 == 0 ) printf "\n --";}' > $OUTPUT_PATH3/nodetool-cfstats-table.txt
-	sed -i '1s/^/ --/' $OUTPUT_PATH3/nodetool-cfstats-table.txt
-	nodetool -p$JMX_PORT compactionstats > $OUTPUT_PATH3/nodetool-compactionstats.txt
-	nodetool -p$JMX_PORT ring > $OUTPUT_PATH3/nodetool-ring.txt
+    echo "Collecting Nodetool Commands Info (using port $JMX_PORT)"
+    echo "--------------------------------------------------"
+    nodetool -p$JMX_PORT status > $OUTPUT_PATH3/nodetool-status.txt
+    nodetool -p$JMX_PORT info > $OUTPUT_PATH3/nodetool-info.txt
+    nodetool -p$JMX_PORT netstats > $OUTPUT_PATH3/nodetool-netstats.txt
+    nodetool -p$JMX_PORT gossipinfo > $OUTPUT_PATH3/nodetool-gossipinfo.txt
+    nodetool -p$JMX_PORT proxyhistograms > $OUTPUT_PATH3/nodetool-proxyhistograms.txt
+    nodetool -p$JMX_PORT cfstats -H | grep Keyspace -A 4 > $OUTPUT_PATH3/nodetool-cfstats-keyspace.txt
+    nodetool -p$JMX_PORT cfstats -H | egrep 'Table:|SSTable count:|Compacted|tombstones' | awk '{$1=$1};1' | awk '{print; if (FNR % 7 == 0 ) printf "\n --";}' > $OUTPUT_PATH3/nodetool-cfstats-table.txt
+    sed -i '1s/^/ --/' $OUTPUT_PATH3/nodetool-cfstats-table.txt
+    nodetool -p$JMX_PORT compactionstats > $OUTPUT_PATH3/nodetool-compactionstats.txt
+    nodetool -p$JMX_PORT ring > $OUTPUT_PATH3/nodetool-ring.txt
 fi
 #not implemented: nodetool cfhistograms $KS $TN >> $OUTPUT_PATH3/nodetool-cfhistograms.txt#
 
 
 #Data Model#
 if [ "$SCYLLA_SERVICE" == "1" ]; then
-	echo "Skipping Data Model Info Collection"
-	echo "--------------------------------------------------"
+    echo "Skipping Data Model Info Collection"
+    echo "--------------------------------------------------"
 else
-	cqlsh `hostname -i` $CQL_PORT -e "HELP" &> /dev/null
-	if [ $? -eq 0 ]; then
-		echo "Collecting Data Model Info (using port $CQL_PORT)"
-		echo "--------------------------------------------------"
-		cqlsh `hostname -i` $CQL_PORT -e "DESCRIBE SCHEMA" > $OUTPUT_PATH4/describe-schema.txt
-		cqlsh `hostname -i` $CQL_PORT -e "DESCRIBE TABLES" > $OUTPUT_PATH4/describe-tables.txt
-	else
-		echo "ERROR: CQL is NOT Listening on Port $CQL_PORT"
-		echo "Cannot Collect Data Model Info"
-		echo "Use the '-q' Option to Provide the CQL Port"
-		echo "--------------------------------------------------"
-	fi
+    cqlsh `hostname -i` $CQL_PORT -e "HELP" &> /dev/null
+    if [ $? -eq 0 ]; then
+        echo "Collecting Data Model Info (using port $CQL_PORT)"
+        echo "--------------------------------------------------"
+        cqlsh `hostname -i` $CQL_PORT -e "DESCRIBE SCHEMA" > $OUTPUT_PATH4/describe-schema.txt
+        cqlsh `hostname -i` $CQL_PORT -e "DESCRIBE TABLES" > $OUTPUT_PATH4/describe-tables.txt
+    else
+        echo "ERROR: CQL is NOT Listening on Port $CQL_PORT"
+        echo "Cannot Collect Data Model Info"
+        echo "Use the '-q' Option to Provide the CQL Port"
+        echo "--------------------------------------------------"
+    fi
 fi
 
 
@@ -257,7 +257,10 @@ echo "Print Network Info: $PRINT_NET"
 echo "--------------------------------------------------"
 
 echo "" > $REPORT
-echo "			  Health Check Report for `hostname -i`" >> $REPORT 
+date "+DATE: %m/%d/%y" >> $REPORT
+echo "" >> $REPORT
+echo "" >> $REPORT
+echo "              Health Check Report for node: `hostname -i`" >> $REPORT 
 echo "" >> $REPORT
 echo "" >> $REPORT
 
@@ -342,11 +345,11 @@ echo "" >> $REPORT
 echo "" >> $REPORT
 
 if [ "$IS_FEDORA" == "0" ]; then
-	echo "## /etc/sysconfig/scylla-server ##" >> $REPORT
+    echo "## /etc/sysconfig/scylla-server ##" >> $REPORT
 fi
 
 if [ "$IS_DEBIAN" == "0" ]; then
-	echo "## /etc/default/scylla-server ##" >> $REPORT
+    echo "## /etc/default/scylla-server ##" >> $REPORT
 fi
 
 cat $OUTPUT_PATH2/scylla-server.txt >> $REPORT
@@ -364,50 +367,50 @@ echo "" >> $REPORT
 echo "" >> $REPORT
 
 if [ "$JMX_SERVICE" == "0" ]; then
-	echo "Nodetool Status/Info/Gossip" >> $REPORT
-	echo "---------------------------" >> $REPORT
-	echo "## Nodetool Status ##" >> $REPORT
-	cat $OUTPUT_PATH3/nodetool-status.txt >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
-	echo "## Nodetool Info ##" >> $REPORT
-	cat $OUTPUT_PATH3/nodetool-info.txt >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
-	echo "## Nodetool GossipInfo ##" >> $REPORT
-	cat $OUTPUT_PATH3/nodetool-gossipinfo.txt >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
+    echo "Nodetool Status/Info/Gossip" >> $REPORT
+    echo "---------------------------" >> $REPORT
+    echo "## Nodetool Status ##" >> $REPORT
+    cat $OUTPUT_PATH3/nodetool-status.txt >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
+    echo "## Nodetool Info ##" >> $REPORT
+    cat $OUTPUT_PATH3/nodetool-info.txt >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
+    echo "## Nodetool GossipInfo ##" >> $REPORT
+    cat $OUTPUT_PATH3/nodetool-gossipinfo.txt >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
 fi
 
 if [ $PRINT_DM == "YES" ]; then
-	echo "DATA MODEL INFO" >> $REPORT
-	echo "===============" >> $REPORT
-	echo "" >> $REPORT
+    echo "DATA MODEL INFO" >> $REPORT
+    echo "===============" >> $REPORT
+    echo "" >> $REPORT
 
-	cqlsh `hostname -i` $CQL_PORT -e "HELP" &> /dev/null
-	if [ $? -eq 0 ]; then
-		echo "Printing Data Model Info to Report"
-		echo "--------------------------------------------------"
+    cqlsh `hostname -i` $CQL_PORT -e "HELP" &> /dev/null
+    if [ $? -eq 0 ]; then
+        echo "Printing Data Model Info to Report"
+        echo "--------------------------------------------------"
 
-		echo "Describe Schema" >> $REPORT
-		echo "---------------" >> $REPORT
-		cat $OUTPUT_PATH4/describe-schema.txt >> $REPORT
-		echo "" >> $REPORT
+        echo "Describe Schema" >> $REPORT
+        echo "---------------" >> $REPORT
+        cat $OUTPUT_PATH4/describe-schema.txt >> $REPORT
+        echo "" >> $REPORT
 
-		echo "Describe Tables" >> $REPORT
-		echo "---------------" >> $REPORT
-		cat $OUTPUT_PATH4/describe-tables.txt >> $REPORT
-		echo "" >> $REPORT
-		echo "" >> $REPORT
-	else
-		echo "ERROR: Data Model NOT Collected - Nothing to Print"
-		echo "--------------------------------------------------"
-		echo "Data Model was not collected" >> $REPORT
-		echo "" >> $REPORT
-		echo "" >> $REPORT
-		echo "" >> $REPORT
-	fi
+        echo "Describe Tables" >> $REPORT
+        echo "---------------" >> $REPORT
+        cat $OUTPUT_PATH4/describe-tables.txt >> $REPORT
+        echo "" >> $REPORT
+        echo "" >> $REPORT
+    else
+        echo "ERROR: Data Model NOT Collected - Nothing to Print"
+        echo "--------------------------------------------------"
+        echo "Data Model was not collected" >> $REPORT
+        echo "" >> $REPORT
+        echo "" >> $REPORT
+        echo "" >> $REPORT
+    fi
 fi
 
 echo "PERFORMANCE and METRICS INFO" >> $REPORT
@@ -415,152 +418,94 @@ echo "============================" >> $REPORT
 echo "" >> $REPORT
 
 if [ "$JMX_SERVICE" == "0" ]; then
-	echo "Nodetool Proxyhistograms (RD/WR latency)" >> $REPORT
-	echo "----------------------------------------" >> $REPORT
-	cat $OUTPUT_PATH3/nodetool-proxyhistograms.txt >> $REPORT
-	echo "" >> $REPORT
+    echo "Nodetool Proxyhistograms (RD/WR latency)" >> $REPORT
+    echo "----------------------------------------" >> $REPORT
+    cat $OUTPUT_PATH3/nodetool-proxyhistograms.txt >> $REPORT
+    echo "" >> $REPORT
 
-	echo "Nodetool netstats" >> $REPORT
-	echo "-----------------" >> $REPORT
-	cat $OUTPUT_PATH3/nodetool-netstats.txt >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
+    echo "Nodetool netstats" >> $REPORT
+    echo "-----------------" >> $REPORT
+    cat $OUTPUT_PATH3/nodetool-netstats.txt >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
 
-	if [ $PRINT_cfstats == "YES" ]; then
-		echo "Printing cfstats Output to Report"
-		echo "--------------------------------------------------"
+    if [ $PRINT_cfstats == "YES" ]; then
+        echo "Printing cfstats Output to Report"
+        echo "--------------------------------------------------"
 
-		echo "Nodetool cfstats" >> $REPORT
-		echo "----------------" >> $REPORT
-		echo "## Keyspace Info ##" >> $REPORT
-		cat $OUTPUT_PATH3/nodetool-cfstats-keyspace.txt >> $REPORT
-		echo "" >> $REPORT
-		echo "" >> $REPORT
-		echo "## Tables Info ##" >> $REPORT
-		cat $OUTPUT_PATH3/nodetool-cfstats-table.txt >> $REPORT
-		echo "" >> $REPORT
-		echo "" >> $REPORT
-	fi
+        echo "Nodetool cfstats" >> $REPORT
+        echo "----------------" >> $REPORT
+        echo "## Keyspace Info ##" >> $REPORT
+        cat $OUTPUT_PATH3/nodetool-cfstats-keyspace.txt >> $REPORT
+        echo "" >> $REPORT
+        echo "" >> $REPORT
+        echo "## Tables Info ##" >> $REPORT
+        cat $OUTPUT_PATH3/nodetool-cfstats-table.txt >> $REPORT
+        echo "" >> $REPORT
+        echo "" >> $REPORT
+    fi
 
-	echo "Nodetool compactionstats" >> $REPORT
-	echo "------------------------" >> $REPORT
-	cat $OUTPUT_PATH3/nodetool-compactionstats.txt >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
+    echo "Nodetool compactionstats" >> $REPORT
+    echo "------------------------" >> $REPORT
+    cat $OUTPUT_PATH3/nodetool-compactionstats.txt >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
 else
-	echo "Nodetool info was not collected" >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
+    echo "Nodetool info was not collected" >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
 fi
 
 if [ $PRINT_NET == "YES" ]; then
-	echo "Printing Network Info to Report"
-	echo "--------------------------------------------------"
+    echo "Printing Network Info to Report"
+    echo "--------------------------------------------------"
 
-	echo "NETWORK INFO" >> $REPORT
-	echo "============" >> $REPORT
-	echo "" >> $REPORT
+    echo "NETWORK INFO" >> $REPORT
+    echo "============" >> $REPORT
+    echo "" >> $REPORT
 
-	echo "ethtool per NIC" >> $REPORT
-	echo "---------------" >> $REPORT
-	cat $OUTPUT_PATH5/ethtool-NIC.txt >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
-	
-	echo "/proc/interrupts" >> $REPORT
-	echo "----------------" >> $REPORT
-	cat $OUTPUT_PATH5/proc-interrupts.txt >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
+    echo "ethtool per NIC" >> $REPORT
+    echo "---------------" >> $REPORT
+    cat $OUTPUT_PATH5/ethtool-NIC.txt >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
+    
+    echo "/proc/interrupts" >> $REPORT
+    echo "----------------" >> $REPORT
+    cat $OUTPUT_PATH5/proc-interrupts.txt >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
 
-	echo "IRQ smp affinity" >> $REPORT
-	echo "----------------" >> $REPORT
-	cat $OUTPUT_PATH5/irq-smp-affinity.txt >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
+    echo "IRQ smp affinity" >> $REPORT
+    echo "----------------" >> $REPORT
+    cat $OUTPUT_PATH5/irq-smp-affinity.txt >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
 
-	echo "sysctl -a" >> $REPORT
-	echo "---------" >> $REPORT
-	cat $OUTPUT_PATH5/sysctl.txt >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
+    echo "sysctl -a" >> $REPORT
+    echo "---------" >> $REPORT
+    cat $OUTPUT_PATH5/sysctl.txt >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
 
-	echo "iptables -L" >> $REPORT
-	echo "-----------" >> $REPORT
-	cat $OUTPUT_PATH5/iptables.txt >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
+    echo "iptables -L" >> $REPORT
+    echo "-----------" >> $REPORT
+    cat $OUTPUT_PATH5/iptables.txt >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
 
-	echo "netstat -an | grep tcp" >> $REPORT
-	echo "----------------------" >> $REPORT
-	cat $OUTPUT_PATH5/netstat-tcp.txt >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
-	echo "" >> $REPORT
+    echo "netstat -an | grep tcp" >> $REPORT
+    echo "----------------------" >> $REPORT
+    cat $OUTPUT_PATH5/netstat-tcp.txt >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
+    echo "" >> $REPORT
 fi
-
-
-echo "MANUAL CHECK LIST" >> $REPORT
-echo "=================" >> $REPORT
-echo "" >> $REPORT
-
-echo "Security Review" >> $REPORT
-echo "---------------" >> $REPORT
-echo "Check the following links:"  >> $REPORT
-echo "- http://www.scylladb.com/2017/02/06/making-sure-your-scylla-cluster-is-secure/" >> $REPORT
-echo "- http://docs.scylladb.com/tls-ssl/" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-
-echo "Backup / Restore Review" >> $REPORT
-echo "-----------------------" >> $REPORT
-echo "Check the following links:"  >> $REPORT
-echo "- http://docs.scylladb.com/procedures/backup/" >> $REPORT
-echo "- http://docs.scylladb.com/procedures/restore/" >> $REPORT
-echo "- http://docs.scylladb.com/procedures/delete_snapshot/" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-
-echo "Repair Verification" >> $REPORT
-echo "-------------------" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-
-echo "Single node / DC Failure Test" >> $REPORT
-echo "-----------------------------" >> $REPORT
-echo "Check the following links:" >> $REPORT
-echo "- http://docs.scylladb.com/procedures/replace_dead_node/" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-
-echo "Other" >> $REPORT
-echo "-----" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-
-
-echo "Signatures" >> $REPORT
-echo "==========" >> $REPORT
-date "+DATE: %m/%d/%y" >> $REPORT
-echo "" >> $REPORT
-echo "" >> $REPORT
-echo "Scylla:________________    Customer:________________" >> $REPORT
-echo "" >> $REPORT
 
 echo "Archiving Output Files"
 echo "--------------------------------------------------"
