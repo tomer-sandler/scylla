@@ -272,8 +272,6 @@ echo "It is based on the configuration data (hardware, OS, Scylla SW, etc.) coll
 echo "Based on the review and analysis of the collected data, ScyllaDB can recommend on possible" >> $REPORT
 echo "ways to better utilize the cluster, based on both experiance and best practices." >> $REPORT
 echo "" >> $REPORT
-echo "Please make sure you review and sign-off the 'MANUAL CHECK LIST' section at the end of the report." >> $REPORT
-echo "" >> $REPORT
 echo "" >> $REPORT
 
 
