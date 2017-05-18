@@ -174,7 +174,7 @@ if [ "$IS_DEBIAN" == "0" ]; then
     dpkg -l | grep -i scylla > $OUTPUT_PATH2/scylla-pkgs.txt
 fi
 
-curl -s -X GET "http://localhost:10000/storage_service/scylla_release_version" > $OUTPUT_PATH2/scylla-version.txt && echo "" >> $OUTPUT_PATH2/scylla-version.txt
+scylla --version > $OUTPUT_PATH2/scylla-version.txt
 cat /etc/scylla/scylla.yaml | grep -v "#" | grep -v "^[[:space:]]*$" > $OUTPUT_PATH2/scylla-yaml.txt
 
 if [ "$IS_FEDORA" == "0" ]; then
@@ -256,7 +256,7 @@ for i in `ls -I lo /sys/class/net/`; do echo "--$i"; cat /sys/class/net/$i/queue
 for i in `ls -I lo /sys/class/net/`; do echo "--$i"; cat /sys/class/net/$i/queues/rx-*/rps_flow_cnt; echo ""; done > $OUTPUT_PATH5/rfs-conf.txt
 ps -elf | grep irqbalance > $OUTPUT_PATH5/irqbalance-conf.txt
 sudo sysctl -a > $OUTPUT_PATH5/sysctl.txt 2>&1
-sudo iptables -L > $OUTPUT_PATH5/iptables.txt
+sudo iptables -L -v > $OUTPUT_PATH5/iptables.txt
 netstat -an | grep tcp > $OUTPUT_PATH5/netstat-tcp.txt
 
 
