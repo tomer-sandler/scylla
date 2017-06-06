@@ -64,7 +64,7 @@ cat /etc/os-release | grep -i fedora &> /dev/null
 if [ $? -ne 0 ]; then
 	cat /etc/os-release | grep -i oracle &> /dev/null
 	if [ $? -ne 0 ]; then
-	IS_FEDORA="1"
+		IS_FEDORA="1"
 	fi
 fi
 
