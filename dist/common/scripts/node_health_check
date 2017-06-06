@@ -2,22 +2,6 @@
 #
 #  Copyright (C) 2017 ScyllaDB
 
-# This file is part of Scylla.
-#
-# Scylla is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Scylla is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Scylla.  If not, see <http://www.gnu.org/licenses/>.
-
-
 ##Variables##
 REPORT="./`hostname -i`-health-check-report.txt"
 OUTPUT_PATH="./output_files"
@@ -75,13 +59,16 @@ while getopts ":hdncap:q:" opt; do
 done
 
 
-##Check if server is Fedora/Debian release##
-cat /etc/os-release | grep fedora &> /dev/null
+##Check server release (Fedora/Oracle/Debian)##
+cat /etc/os-release | grep -i fedora &> /dev/null
 if [ $? -ne 0 ]; then
-    IS_FEDORA="1"
+	cat /etc/os-release | grep -i oracle &> /dev/null
+	if [ $? -ne 0 ]; then
+	IS_FEDORA="1"
+	fi
 fi
 
-cat /etc/os-release | grep debian &> /dev/null
+cat /etc/os-release | grep -i debian &> /dev/null
 if [ $? -ne 0 ]; then
     IS_DEBIAN="1"
 fi
@@ -91,25 +78,24 @@ if [ "$IS_FEDORA" == "1" ] && [ "$IS_DEBIAN" == "1" ]; then
     exit 222
 fi
 
-##Pass criteria for script execution##
-#Check scylla service#
+##Scylla-server service status##
 echo "--------------------------------------------------"
-echo "Checking Scylla Service"
+echo "Checking Scylla-server Service"
 echo "--------------------------------------------------"
 
 ps -C scylla --no-headers &> /dev/null
 if [ $? -ne 0 ]; then
     SCYLLA_SERVICE="1"
-    echo "ERROR: Scylla is NOT Running"
+    echo "ERROR: Scylla-server is NOT Running"
     echo "Cannot Collect Data Model Info"
     echo "--------------------------------------------------"
 else
-    echo "Scylla Service: OK"
+    echo "Scylla-server Service: OK"
     echo "--------------------------------------------------"
 fi 
 
 
-#Check Scylla-JMX service#
+##Scylla-JMX service status##
 echo "Checking Scylla-JMX Service on Port $JMX_PORT"
 echo "--------------------------------------------------"
 
@@ -121,7 +107,7 @@ if [ $? -ne 0 ]; then
     echo "Use the '-p' Option to Provide the Scylla-JMX Port"
     echo "--------------------------------------------------"
 else
-    echo "JMX Service (nodetool): OK"
+    echo "Scylla-JMX Service (nodetool): OK"
     echo "--------------------------------------------------"
 fi 
 
@@ -276,7 +262,7 @@ echo "" > $REPORT
 date "+DATE: %m/%d/%y" >> $REPORT
 echo "" >> $REPORT
 echo "" >> $REPORT
-echo "              Health Check Report for node: `hostname -i`" >> $REPORT
+echo "              Health Check Report for node: `hostname -i`" >> $REPORT 
 echo "" >> $REPORT
 echo "" >> $REPORT
 
@@ -485,7 +471,7 @@ if [ $PRINT_NET == "YES" ]; then
     cat $OUTPUT_PATH5/ethtool-NIC.txt >> $REPORT
     echo "" >> $REPORT
     echo "" >> $REPORT
-
+    
     echo "/proc/interrupts" >> $REPORT
     echo "----------------" >> $REPORT
     cat $OUTPUT_PATH5/proc-interrupts.txt >> $REPORT
